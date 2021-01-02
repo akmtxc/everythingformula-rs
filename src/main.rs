@@ -1,35 +1,24 @@
-use image::{*};
-use std::{thread, time};
-use uint::construct_uint;
-
-construct_uint! {
-  struct U8192(128);
-}
+extern crate image; // это для оперирования с картинками
+use std::num::Wrapping;
+use num::{BigUint};
 
 fn main() {
-  let lumized = image::open("images/newyearspruce.png").unwrap().into_luma8();
-  lumized.save("images/lumanewyearspruce.png").unwrap();
-  let twodecstr = image::open("images/lumanewyearspruce.png").unwrap().into_bytes(); // ок 
+  let lumized = image::open("C:/Users/Стас/Desktop/everythingformula/images/smallspruce.png").unwrap().into_luma8(); // перевожу в чёрно-белую систему цветов
+  lumized.save("C:/Users/Стас/Desktop/everythingformula/images/lumasmallspruce.png").unwrap(); // сохраняю
+  let twodecstr = image::open("C:/Users/Стас/Desktop/everythingformula/images/lumasmallspruce.png").unwrap().into_bytes(); // перевожу в байты
 
-  let mut rightbyte: Vec<u8> = Vec::new();
+  let mut rightbyte: Vec<u8> = Vec::new(); 
   for (i, &item) in twodecstr.iter().enumerate() {
-    if item < 127 || item == 255 {
-      rightbyte.push(0);
-    } else if item > 127 && item != 255 {
+    if item < 127 {
       rightbyte.push(1);
+    } else if item > 127 {
+      rightbyte.push(0);
     }
   };
-
-  let mut decstr = to_u8192(rightbyte);
+  
+  let mut arrstr: &[u8] = &rightbyte;
+  println!("{:?}", arrstr);
+  let mut decstr = BigUint::from_bytes_le(arrstr);
   decstr = &decstr * 17 as u8;
-  println!("{:?}", decstr);
-
-
-  let secs = time::Duration::from_secs(2);
-
-  thread::sleep(secs);
-}
-
-fn to_u8192(slice: Vec<u8>) -> U8192 {
-  slice.iter().rev().fold(U8192::from(0), |acc, &b| U8192::from((acc << 1) | U8192::from(b)) + U8192::from(b))
+  println!("{}", decstr);
 }
